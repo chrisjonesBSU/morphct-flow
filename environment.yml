@@ -1,0 +1,9 @@
+name: morphct-flow
+channels:
+  - conda-forge
+dependencies:
+  - pip=21.0.1
+  - pytest
+  - python=3.7
+  - signac=1.6.0
+  - signac-flow=0.13.0
