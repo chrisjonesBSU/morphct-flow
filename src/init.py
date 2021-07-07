@@ -31,7 +31,7 @@ parameters = {
     # (from planckton use the ref_distance in job doc)
     "scale": [3.5636],
 
-    "force_field": ["gaff"],
+    "forcefield": ["gaff"],
 
     "reorganization_energy": [0.15],
 
@@ -40,7 +40,7 @@ parameters = {
 
     "lifetimes": [[1e-13,1e-12]],
 
-    "n_holes": [10],
+    "n_holes": [0],
     "n_elec": [10],
 }
 
