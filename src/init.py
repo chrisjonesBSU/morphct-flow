@@ -12,19 +12,36 @@ project_name = "my_project"
 
 # Parameters used for generating the morphology
 parameters = {
-    # input can be the path to a molecule file or a SMILES string
-    # or a key to the COMPOUND dictionary in PlanckTon (shown below)
-    # The compounds ending with "-gaff" are designed to be used with the
-    # "gaff-custom" forcefield; if using a smiles string, use just "gaff".
-    # Mixtures can be specified like so
-    # "input" = [["PCBM-gaff", "P3HT-16-gaff"]]
-    # note the additional brackets
-    "input": [
-        "path/to/input"
-        ],
+    # input structure (path to a gsd file)
+    "input": ["path/to/input"],
+
+    "mol_length": [186],
+
+    # chromophore specification
+    "acceptors": ["path/to/csv"],
+    "donors": ["path/to/csv"],
+
+    "acceptor_charge": [-1],
+    "donor_charge": [0],
+
+    # frame index
+    "frame": [-1],
+
+    # scale needed to convert lengths to Angstrom
+    # (from planckton use the ref_distance in job doc)
+    "scale": [3.5636],
+
+    "force_field": ["gaff"],
+
+    "reorganization_energy": [0.15],
 
     # Temperatures specified in Kelvin
-    "temperature": [300],,
+    "temperature": [300],
+
+    "lifetimes": [[1e-13,1e-12]],
+
+    "n_holes": [10],
+    "n_elec": [10],
 }
 
 
