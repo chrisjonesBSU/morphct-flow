@@ -66,11 +66,61 @@ def on_container(func):
     )(func)
 
 
-@on_container
+#@on_container
 @directives(ngpu=1)
 @MyProject.operation
 def run_charge_transport(job):
-    pass
+    import numpy as np
+
+    from morphct.system import System
+
+    if job.sp.forcefield == "gaff":
+        from morphct.chromophores import amber_dict
+        conversion_dict = amber_dict
+    else:
+        raise NotImplementedError(
+            f"Conversion dictionary for {job.sp.forcefield} does not exist."
+        )
+
+    system = System(
+        gsdfile,
+        "output",
+        frame=job.sp.frame,
+        scale=job.sp.scale,
+        conversion_dict=conversion_dict
+    )
+
+    n_mols = system.snap.particles.N // job.sp.mol_length
+    mol_length = job.sp.mol_length
+
+    try:
+        a_inds = np.loadtxt(job.sp.acceptors, dtype=int)
+        if len(a_inds.shape) > 1:
+            acc_inds = [
+                item for sublist in
+                [[x + i * mol_length for x in a_inds] for i in range(n_mols)]
+                for item in sublist
+            ]
+        else:
+            acc_inds = [a_inds + i * mol_length for i in range(n_mols)]
+    except ValueError:
+        # no acceptors
+        pass
+
+    try:
+        d_inds = np.loadtxt(job.sp.donors, dtype=int)
+        if len(d_inds.shape) > 1:
+            don_inds = [
+                item for sublist in
+                [[x + i * mol_length for x in d_inds] for i in range(n_mols)]
+                for item in sublist
+            ]
+        else:
+            don_inds = [d_inds + i * mol_length for i in range(n_mols)]
+
+    except ValueError:
+        # no donors
+        pass
 
 if __name__ == "__main__":
     MyProject().main()
