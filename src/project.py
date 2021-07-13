@@ -9,7 +9,7 @@ import flow
 from flow import FlowProject, directives
 from flow.environment import DefaultSlurmEnvironment
 from flow.environments.xsede import Bridges2Environment
-from os import path
+import os
 
 
 class MyProject(FlowProject):
@@ -59,6 +59,22 @@ class Kestrel(DefaultSlurmEnvironment):
         )
 
 
+def get_paths(path, job):
+    # job.ws will be the path to the job e.g.,
+    # path/to/morphct-flow/workspace/jobid
+    # this is the root dir e.g.,
+    # path/to/morphct-flow
+    file_path = os.path.abspath(path.join(job.ws, "..", "..", path))
+    if path.isfile(path):
+        return path
+    elif path.isfile(file_path):
+        return file_path
+    raise FileNotFoundError(
+        "Please provide either a path to a file (the absolute path or the "
+        "relative path in the morphct-flow root directory)."
+        f"You provided: {path}"
+    )
+
 # Definition of project-related labels (classification)
 def on_container(func):
     return flow.directives(
@@ -82,9 +98,11 @@ def run_charge_transport(job):
             f"Conversion dictionary for {job.sp.forcefield} does not exist."
         )
 
+    gsdfile = get_paths(job.sp.input, job)
+
     system = System(
         gsdfile,
-        "output",
+        os.path.join(job.ws,"output"),
         frame=job.sp.frame,
         scale=job.sp.scale,
         conversion_dict=conversion_dict
@@ -94,7 +112,8 @@ def run_charge_transport(job):
     mol_length = job.sp.mol_length
 
     try:
-        a_inds = np.loadtxt(job.sp.acceptors, dtype=int)
+        a_file = get_paths(job.sp.acceptors, job)
+        a_inds = np.loadtxt(a_file, dtype=int)
         if len(a_inds.shape) > 1:
             acc_inds = [
                 item for sublist in
@@ -103,12 +122,13 @@ def run_charge_transport(job):
             ]
         else:
             acc_inds = [a_inds + i * mol_length for i in range(n_mols)]
-    except ValueError:
+    except FileNotFoundError:
         # no acceptors
         pass
 
     try:
-        d_inds = np.loadtxt(job.sp.donors, dtype=int)
+        d_file = get_paths(job.sp.donors, job)
+        d_inds = np.loadtxt(d_file, dtype=int)
         if len(d_inds.shape) > 1:
             don_inds = [
                 item for sublist in
@@ -118,7 +138,7 @@ def run_charge_transport(job):
         else:
             don_inds = [d_inds + i * mol_length for i in range(n_mols)]
 
-    except ValueError:
+    except FileNotFoundError:
         # no donors
         pass
 
