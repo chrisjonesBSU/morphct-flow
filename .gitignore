@@ -1,3 +1,8 @@
+# workspace specific
+signac*
+workspace
+*.gsd
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
