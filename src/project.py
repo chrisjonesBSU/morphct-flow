@@ -122,6 +122,16 @@ def run_charge_transport(job):
             ]
         else:
             acc_inds = [a_inds + i * mol_length for i in range(n_mols)]
+
+        system.add_chromophores(
+            acc_inds,
+            "acceptor",
+            chromophore_kwargs={
+                "reorganization_energy": job.sp.reorganization_energy,
+                "charge": job.sp.acceptor_charge,
+                }
+        )
+
     except FileNotFoundError:
         # no acceptors
         pass
@@ -138,9 +148,29 @@ def run_charge_transport(job):
         else:
             don_inds = [d_inds + i * mol_length for i in range(n_mols)]
 
+        system.add_chromophores(
+            don_inds,
+            "donor",
+            chromophore_kwargs={
+                "reorganization_energy": job.sp.reorganization_energy,
+                "charge": job.sp.donor_charge,
+                }
+        )
+
     except FileNotFoundError:
         # no donors
         pass
+
+    system.compute_energies()
+    system.set_energies()
+
+    system.run_kmc(
+        job.sp.lifetimes,
+        job.sp.temperature,
+        n_holes=job.sp.n_holes,
+        n_elec=job.sp.n_elec,
+        verbose=1
+    )
 
 if __name__ == "__main__":
     MyProject().main()
