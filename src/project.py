@@ -60,14 +60,16 @@ class Kestrel(DefaultSlurmEnvironment):
 
 
 def get_paths(path, job):
+    if path is None:
+        raise FileNotFoundError
     # job.ws will be the path to the job e.g.,
     # path/to/morphct-flow/workspace/jobid
     # this is the root dir e.g.,
     # path/to/morphct-flow
-    file_path = os.path.abspath(path.join(job.ws, "..", "..", path))
-    if path.isfile(path):
+    file_path = os.path.abspath(os.path.join(job.ws, "..", "..", path))
+    if os.path.isfile(path):
         return path
-    elif path.isfile(file_path):
+    elif os.path.isfile(file_path):
         return file_path
     raise FileNotFoundError(
         "Please provide either a path to a file (the absolute path or the "
@@ -129,7 +131,7 @@ def run_charge_transport(job):
             chromophore_kwargs={
                 "reorganization_energy": job.sp.reorganization_energy,
                 "charge": job.sp.acceptor_charge,
-                }
+            }
         )
 
     except FileNotFoundError:
@@ -154,7 +156,7 @@ def run_charge_transport(job):
             chromophore_kwargs={
                 "reorganization_energy": job.sp.reorganization_energy,
                 "charge": job.sp.donor_charge,
-                }
+            }
         )
 
     except FileNotFoundError:
