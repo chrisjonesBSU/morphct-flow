@@ -8,20 +8,20 @@ from itertools import product
 import signac
 
 
-project_name = "my_project"
+project_name = "morphct"
 
 # Parameters used for generating the morphology
 parameters = {
     # input structure (path to a gsd file)
-    "input": ["path/to/input"],
+    "input": ["itic-trajectory.gsd"],
 
     "mol_length": [186],
 
     # chromophore specification
-    "acceptors": ["path/to/csv"],
-    "donors": ["path/to/csv"],
+    "acceptors": ["itic_all_ids.csv"],
+    "donors": [None],
 
-    "acceptor_charge": [-1],
+    "acceptor_charge": [0],
     "donor_charge": [0],
 
     # frame index
