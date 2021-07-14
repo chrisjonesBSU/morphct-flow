@@ -76,13 +76,13 @@ def get_paths(path, job):
     )
 
 # Definition of project-related labels (classification)
-def on_container(func):
+def on_morphct(func):
     return flow.directives(
         executable='singularity exec --nv $MORPHCT_SIMG python'
     )(func)
 
 
-#@on_container
+@on_morphct
 @directives(ngpu=1)
 @MyProject.operation
 def run_charge_transport(job):
