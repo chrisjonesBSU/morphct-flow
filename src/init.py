@@ -31,7 +31,7 @@ parameters = {
     # Path to a csv file containing the particle indices of the first
     # chromophore. The molecule length will be used to scale these indices
     # out to the rest of the system.
-    "acceptors": ["itic_all_ids.csv"],
+    "acceptors": ["data/itic_all_ids.csv"],
     "donors": [None],
 
     # If the pyscf calculation errors out due to electron spin, a charge
