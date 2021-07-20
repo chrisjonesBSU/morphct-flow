@@ -15,24 +15,32 @@ parameters = {
     # Structure and chemistry
     #------------------------
     # Input structure (path to a gsd file)
-    "input": ["itic-trajectory.gsd"],
+    "input": ["p3ht-trajectory.gsd"],
 
     # Index of the frame in the input gsd trajectory to use
     "frame": [-1],
 
     # The number of atoms in each molecule
-    "mol_length": [186],
+    "mol_length": [
+        #186 # ITIC
+        402 # P3HT 16-mer
+    ],
 
     # Chemistry-specific reorganization energy in eV
-    "reorganization_energy": [0.15],
+    "reorganization_energy": [
+        #0.15  # ITIC
+        0.3064 # P3HT
+    ],
 
     # Chromophore specification
     #--------------------------
-    # Path to a csv file containing the particle indices of the first
-    # chromophore. The molecule length will be used to scale these indices
-    # out to the rest of the system.
-    "acceptors": ["data/itic_all_ids.csv"],
-    "donors": [None],
+    # Path to a csv file containing the particle indices of chromophore(s) in
+    # the first molecule. The molecule length will be used to scale these
+    # indices out to the rest of the system.
+    # How to generate these files can be found notebooks in morphct/examples.
+    # Some files are provided in 'data' directory.
+    "acceptors": [None],
+    "donors": ["data/p3ht_d_ids.csv"],
 
     # If the pyscf calculation errors out due to electron spin, a charge
     # can be specified here to fix it.
@@ -56,8 +64,8 @@ parameters = {
     "lifetimes": [[1e-13,1e-12]],
 
     # Number of holes (for donor) and/or electrons (for acceptor)
-    "n_holes": [0],
-    "n_elec": [10],
+    "n_holes": [10],
+    "n_elec": [0],
 }
 
 
