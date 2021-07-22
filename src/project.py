@@ -85,7 +85,8 @@ def on_morphct(func):
 
 
 @on_morphct
-@directives(ngpu=1)
+@directives(N=1)
+@directives(n=16)
 @MyProject.operation
 def run_charge_transport(job):
     import numpy as np
