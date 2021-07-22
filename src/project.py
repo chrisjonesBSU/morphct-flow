@@ -77,6 +77,7 @@ def get_paths(path, job):
         f"You provided: {path}"
     )
 
+
 # Definition of project-related labels (classification)
 def on_morphct(func):
     return flow.directives(
@@ -84,10 +85,24 @@ def on_morphct(func):
     )(func)
 
 
+@MyProject.label
+def energies_calced(job):
+    return (
+        job.isfile("output/dimer_energies.txt") and
+        job.isfile("output/singles_energies.txt")
+    )
+
+
+@MyProject.label
+def CT_calced(job):
+    return job.isfile("output/kmc/results.csv")
+
+
 @on_morphct
 @directives(N=1)
 @directives(n=16)
 @MyProject.operation
+@MyProject.post(CT_calced)
 def run_charge_transport(job):
     import numpy as np
 
