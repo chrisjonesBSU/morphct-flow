@@ -86,14 +86,6 @@ def on_morphct(func):
 
 
 @MyProject.label
-def energies_calced(job):
-    return (
-        job.isfile("output/dimer_energies.txt") and
-        job.isfile("output/singles_energies.txt")
-    )
-
-
-@MyProject.label
 def CT_calced(job):
     return job.isfile("output/kmc/results.csv")
 
@@ -117,6 +109,7 @@ def run_charge_transport(job):
         )
 
     gsdfile = get_paths(job.sp.input, job)
+    print("GSD path found.")
 
     system = System(
         gsdfile,
@@ -125,6 +118,8 @@ def run_charge_transport(job):
         scale=job.sp.scale,
         conversion_dict=conversion_dict
     )
+
+    print("System initialized.")
 
     n_mols = system.snap.particles.N // job.sp.mol_length
     mol_length = job.sp.mol_length
@@ -179,6 +174,8 @@ def run_charge_transport(job):
         # no donors
         pass
 
+    print("Chromophores added.")
+
     system.compute_energies()
     system.set_energies()
 
@@ -189,6 +186,7 @@ def run_charge_transport(job):
         n_elec=job.sp.n_elec,
         verbose=1
     )
+
 
 if __name__ == "__main__":
     MyProject().main()
