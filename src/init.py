@@ -17,40 +17,31 @@ parameters = {
     # Input structure (path to a gsd file)
     "input": ["p3ht-trajectory.gsd"],
 
+    # Pickle file
+    "pickle": [None]
+
+    # System name
+    "name": ["pps-amorphous"]
+
     # Index of the frame in the input gsd trajectory to use
     "frame": [-1],
-
-    # The number of atoms in each molecule
-    "mol_length": [
-        #186 # ITIC
-        402 # P3HT 16-mer
-    ],
 
     # Chemistry-specific reorganization energy in eV
     "reorganization_energy": [
         #0.15  # ITIC
-        0.3064 # P3HT
+        #0.3064 # P3HT
+        1.0
     ],
 
-    # Chromophore specification
-    #--------------------------
-    # Path to a csv file containing the particle indices of chromophore(s) in
-    # the first molecule. The molecule length will be used to scale these
-    # indices out to the rest of the system.
-    # How to generate these files can be found notebooks in morphct/examples.
-    # Some files are provided in 'data' directory.
-    "acceptors": [None],
-    "donors": ["data/p3ht_d_ids.csv"],
+    # Charge carrier type
+    "carrier_type": ["donor"]
 
     # If the pyscf calculation errors out due to electron spin, a charge
     # can be specified here to fix it.
     "acceptor_charge": [0],
     "donor_charge": [0],
 
-    # PlanckTon specific conversions
-    #-------------------------------
     # scale needed to convert lengths to Angstrom
-    # (from planckton use the ref_distance in job doc)
     "scale": [3.5636],
 
     "forcefield": ["gaff"],
@@ -61,7 +52,7 @@ parameters = {
     "temperature": [300],
 
     # Carrier lifetimes in seconds
-    "lifetimes": [[1e-13,1e-12]],
+    "lifetimes": [[1e-13, 1e-12]],
 
     # Number of holes (for donor) and/or electrons (for acceptor)
     "n_holes": [10],

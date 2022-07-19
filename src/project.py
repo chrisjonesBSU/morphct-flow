@@ -97,12 +97,15 @@ def CT_calced(job):
 @MyProject.post(CT_calced)
 def run_charge_transport(job):
     import numpy as np
-
+    import polybinderCG as cg
     from morphct.system import System
 
     if job.sp.forcefield == "gaff":
         from morphct.chromophores import amber_dict
         conversion_dict = amber_dict
+    elif job.sp.forcefield == "opls":
+        from morphct.chromophores import opls_dict
+        conversion_dict = opls_dict
     else:
         raise NotImplementedError(
             f"Conversion dictionary for {job.sp.forcefield} does not exist."
@@ -118,67 +121,24 @@ def run_charge_transport(job):
         scale=job.sp.scale,
         conversion_dict=conversion_dict
     )
-
     print("System initialized.")
 
-    n_mols = system.snap.particles.N // job.sp.mol_length
-    mol_length = job.sp.mol_length
+	chromo_ids = []
+	cg_sys = cg.coarse_grain.System(gsd_file=gsd_file, compound="PPS")
+	for mon in cg_sys.monomers():
+		mon.generate_components(index_mapping="ring_plus_linkage_AA")
+	for component in cg_sys.components():
+		chromo_ids.append(component.atom_indices)
 
-    try:
-        a_file = get_paths(job.sp.acceptors, job)
-        a_inds = np.loadtxt(a_file, dtype=int)
-        if len(a_inds.shape) > 1:
-            acc_inds = [
-                item for sublist in
-                [[x + i * mol_length for x in a_inds] for i in range(n_mols)]
-                for item in sublist
-            ]
-        else:
-            acc_inds = [a_inds + i * mol_length for i in range(n_mols)]
+	system.add_chromophores(chromo_ids, job.sp.carrier_type)
+	print("Chromophores added.")
 
-        system.add_chromophores(
-            acc_inds,
-            "acceptor",
-            chromophore_kwargs={
-                "reorganization_energy": job.sp.reorganization_energy,
-                "charge": job.sp.acceptor_charge,
-            }
-        )
-
-    except FileNotFoundError:
-        # no acceptors
-        pass
-
-    try:
-        d_file = get_paths(job.sp.donors, job)
-        d_inds = np.loadtxt(d_file, dtype=int)
-        if len(d_inds.shape) > 1:
-            don_inds = [
-                item for sublist in
-                [[x + i * mol_length for x in d_inds] for i in range(n_mols)]
-                for item in sublist
-            ]
-        else:
-            don_inds = [d_inds + i * mol_length for i in range(n_mols)]
-
-        system.add_chromophores(
-            don_inds,
-            "donor",
-            chromophore_kwargs={
-                "reorganization_energy": job.sp.reorganization_energy,
-                "charge": job.sp.donor_charge,
-            }
-        )
-
-    except FileNotFoundError:
-        # no donors
-        pass
-
-    print("Chromophores added.")
-
-    system.compute_energies()
-    system.set_energies()
-
+	system.compute_energies()
+    print("Energies calculated")
+	system.set_energies()
+    print("Energies set")
+    
+    print("Starting KMC run")
     system.run_kmc(
         job.sp.lifetimes,
         job.sp.temperature,
@@ -186,6 +146,7 @@ def run_charge_transport(job):
         n_elec=job.sp.n_elec,
         verbose=1
     )
+    print("Finished KMC run")
 
 
 if __name__ == "__main__":
