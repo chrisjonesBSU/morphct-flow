@@ -90,14 +90,13 @@ def CT_calced(job):
     return job.isfile("output/kmc/results.csv")
 
 
-@on_morphct
 @directives(N=1)
 @directives(n=16)
 @MyProject.operation
 @MyProject.post(CT_calced)
 def run_charge_transport(job):
     import numpy as np
-    import polybinderCG as cg
+    import polybinderCG.coarse_grain as cg
     from morphct.system import System
 
     if job.sp.forcefield == "gaff":
@@ -123,21 +122,21 @@ def run_charge_transport(job):
     )
     print("System initialized.")
 
-	chromo_ids = []
-	cg_sys = cg.coarse_grain.System(gsd_file=gsd_file, compound="PPS")
-	for mon in cg_sys.monomers():
-		mon.generate_components(index_mapping="ring_plus_linkage_AA")
-	for component in cg_sys.components():
-		chromo_ids.append(component.atom_indices)
+    chromo_ids = []
+    cg_sys = cg.System(gsd_file=gsd_file, compound="PPS")
+    for mon in cg_sys.monomers():
+        mon.generate_components(index_mapping="ring_plus_linkage_AA")
+    for component in cg_sys.components():
+        chromo_ids.append(component.atom_indices)
 
-	system.add_chromophores(chromo_ids, job.sp.carrier_type)
-	print("Chromophores added.")
+    system.add_chromophores(chromo_ids, job.sp.carrier_type)
+    print("Chromophores added.")
 
-	system.compute_energies()
+    system.compute_energies()
     print("Energies calculated")
-	system.set_energies()
+    system.set_energies()
     print("Energies set")
-    
+
     print("Starting KMC run")
     system.run_kmc(
         job.sp.lifetimes,
