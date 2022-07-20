@@ -46,15 +46,15 @@ class Fry(DefaultSlurmEnvironment):
         )
 
 
-class Kestrel(DefaultSlurmEnvironment):
-    hostname_pattern = "kestrel"
-    template = "kestrel.sh"
+class R2(DefaultSlurmEnvironment):
+    hostname_pattern = "r2"
+    template = "r2.sh"
 
     @classmethod
     def add_args(cls, parser):
         parser.add_argument(
             "--partition",
-            default="batch",
+            default="defq",
             help="Specify the partition to submit to."
         )
 
@@ -98,6 +98,7 @@ def run_charge_transport(job):
     import numpy as np
     import polybinderCG.coarse_grain as cg
     from morphct.system import System
+    print(f"Starting job {job.id}")
 
     if job.sp.forcefield == "gaff":
         from morphct.chromophores import amber_dict
@@ -123,7 +124,7 @@ def run_charge_transport(job):
     print("System initialized.")
 
     chromo_ids = []
-    cg_sys = cg.System(gsd_file=gsd_file, compound="PPS")
+    cg_sys = cg.System(gsd_file=gsdfile, compound="PPS")
     for mon in cg_sys.monomers():
         mon.generate_components(index_mapping="ring_plus_linkage_AA")
     for component in cg_sys.components():
