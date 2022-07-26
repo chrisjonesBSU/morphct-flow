@@ -34,7 +34,7 @@ parameters = {
     ],
 
     # Charge carrier type
-    "carrier_type": ["donor"],
+    "carrier_type": ["acceptor"],
 
     # If the pyscf calculation errors out due to electron spin, a charge
     # can be specified here to fix it.
@@ -57,7 +57,6 @@ parameters = {
     # Number of holes (for donor) and/or electrons (for acceptor)
     "n_holes": [25],
     "n_elec": [0],
-}
 
 
 def get_parameters(parameters):

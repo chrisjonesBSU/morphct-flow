@@ -46,15 +46,15 @@ class Fry(DefaultSlurmEnvironment):
         )
 
 
-class Kestrel(DefaultSlurmEnvironment):
-    hostname_pattern = "kestrel"
-    template = "kestrel.sh"
+class R2(DefaultSlurmEnvironment):
+    hostname_pattern = "r2"
+    template = "r2.sh"
 
     @classmethod
     def add_args(cls, parser):
         parser.add_argument(
             "--partition",
-            default="batch",
+            default="defq",
             help="Specify the partition to submit to."
         )
 
