@@ -15,16 +15,16 @@ parameters = {
     # Structure and chemistry
     #------------------------
     # Input structure (path to a gsd file)
-    "input": ["p3ht-trajectory.gsd"],
+    "input": ["pps-amorph-polydisperse.gsd"],
 
     # Pickle file
-    "pickle": [None]
+    "pickle": [None],
 
     # System name
-    "name": ["pps-amorphous"]
+    "name": ["pps-amorphous"],
 
     # Index of the frame in the input gsd trajectory to use
-    "frame": [-1],
+    "frame": [-1, -3, -5],
 
     # Chemistry-specific reorganization energy in eV
     "reorganization_energy": [
@@ -34,7 +34,7 @@ parameters = {
     ],
 
     # Charge carrier type
-    "carrier_type": ["donor"]
+    "carrier_type": ["donor"],
 
     # If the pyscf calculation errors out due to electron spin, a charge
     # can be specified here to fix it.
@@ -44,18 +44,18 @@ parameters = {
     # scale needed to convert lengths to Angstrom
     "scale": [3.5636],
 
-    "forcefield": ["gaff"],
+    "forcefield": ["opls"],
 
     # KMC Parameters
     #---------------
     # Temperatures specified in Kelvin
-    "temperature": [300],
+    "temperature": [300, 400, 500, 600],
 
     # Carrier lifetimes in seconds
-    "lifetimes": [[1e-13, 1e-12]],
+    "lifetimes": [[1e-8, 5e-7, 1e-7, 5e-6]],
 
     # Number of holes (for donor) and/or electrons (for acceptor)
-    "n_holes": [10],
+    "n_holes": [25],
     "n_elec": [0],
 }
 
