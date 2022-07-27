@@ -58,6 +58,18 @@ class R2(DefaultSlurmEnvironment):
             help="Specify the partition to submit to."
         )
 
+class Borah(DefaultSlurmEnvironment):
+    hostname_pattern = "borah"
+    template = "borah.sh"
+
+    @classmethod
+    def add_args(cls, parser):
+        parser.add_argument(
+            "--partition",
+            default="bsudfq",
+            help="Specify the partition to submit to."
+        )
+
 
 def get_paths(path, job):
     if path is None:
@@ -111,7 +123,7 @@ def run_charge_transport(job):
             f"Conversion dictionary for {job.sp.forcefield} does not exist."
 		)
 
-    if job.sp.input and not job.sp.pickle_file:
+    if job.sp.input and not job.sp.pickle:
         gsdfile = get_paths(job.sp.input, job)
         print("GSD path found.")
         system = System(
@@ -137,7 +149,7 @@ def run_charge_transport(job):
         system.set_energies()
         print("Energies set")
     else:
-        pickle_file = open(job.sp.pickle_file, "rb")
+        pickle_file = open(job.sp.pickle, "rb")
         system = pickle.load(pickle_file)
         print("System initialized from pickle file.")
 
