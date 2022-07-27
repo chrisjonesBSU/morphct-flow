@@ -107,7 +107,10 @@ def CT_calced(job):
 @MyProject.operation
 @MyProject.post(CT_calced)
 def run_charge_transport(job):
+    import os
+
     import numpy as np
+    import pickle
     import polybinderCG.coarse_grain as cg
     from morphct.system import System
     print(f"Starting job {job.id}")
@@ -164,12 +167,10 @@ def run_charge_transport(job):
 	# Save primary results to the job document file
     job.doc.displacements = system._carrier_data["displacement"]
     job.doc.images = system._carrier_data["image"]
-    job.doc.n_hops = system._carrier_data["n_hops"]
-    job.doc.init_position = system._carrier_data["initial_position"]
 
     print("Finished KMC run")
     print("Saving final pickle file")
-    pickle_file = open("finished.pickel", "wb")
+    pickle_file = open(os.path.join(job.ws, "finished.pickel"), "wb")
     pickle.dump(system, pickle_file)
     pickle_file.close()
     print("Pickle file saved")
