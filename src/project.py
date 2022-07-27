@@ -109,34 +109,37 @@ def run_charge_transport(job):
     else:
         raise NotImplementedError(
             f"Conversion dictionary for {job.sp.forcefield} does not exist."
-        )
+		)
 
-    gsdfile = get_paths(job.sp.input, job)
-    print("GSD path found.")
+    if job.sp.input and not job.sp.pickle_file:
+        gsdfile = get_paths(job.sp.input, job)
+        print("GSD path found.")
+        system = System(
+                gsdfile,
+                os.path.join(job.ws,"output"),
+                frame=job.sp.frame,
+                scale=job.sp.scale,
+                conversion_dict=conversion_dict
+		)
+        print("System initialized from gsd file.")
 
-    system = System(
-        gsdfile,
-        os.path.join(job.ws,"output"),
-        frame=job.sp.frame,
-        scale=job.sp.scale,
-        conversion_dict=conversion_dict
-    )
-    print("System initialized.")
+        chromo_ids = []
+        cg_sys = cg.System(gsd_file=gsdfile, compound="PPS")
+        for mon in cg_sys.monomers():
+            mon.generate_components(index_mapping="ring_plus_linkage_AA")
+        for component in cg_sys.components():
+            chromo_ids.append(component.atom_indices)
 
-    chromo_ids = []
-    cg_sys = cg.System(gsd_file=gsdfile, compound="PPS")
-    for mon in cg_sys.monomers():
-        mon.generate_components(index_mapping="ring_plus_linkage_AA")
-    for component in cg_sys.components():
-        chromo_ids.append(component.atom_indices)
-
-    system.add_chromophores(chromo_ids, job.sp.carrier_type)
-    print("Chromophores added.")
-
-    system.compute_energies()
-    print("Energies calculated")
-    system.set_energies()
-    print("Energies set")
+        system.add_chromophores(chromo_ids, job.sp.carrier_type)
+        print("Chromophores added.")
+        system.compute_energies()
+        print("Energies calculated")
+        system.set_energies()
+        print("Energies set")
+    else:
+        pickle_file = open(job.sp.pickle_file, "rb")
+        system = pickle.load(pickle_file)
+        print("System initialized from pickle file.")
 
     print("Starting KMC run")
     system.run_kmc(
@@ -145,8 +148,19 @@ def run_charge_transport(job):
         n_holes=job.sp.n_holes,
         n_elec=job.sp.n_elec,
         verbose=1
-    )
+	)
+	# Save primary results to the job document file
+    job.doc.displacements = system._carrier_data["displacement"]
+    job.doc.images = system._carrier_data["image"]
+    job.doc.n_hops = system._carrier_data["n_hops"]
+    job.doc.init_position = system._carrier_data["initial_position"]
+
     print("Finished KMC run")
+    print("Saving final pickle file")
+    pickle_file = open("finished.pickel", "wb")
+    pickle.dump(system, pickle_file)
+    pickle_file.close()
+    print("Pickle file saved")
 
 
 if __name__ == "__main__":
