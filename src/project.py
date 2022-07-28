@@ -99,7 +99,12 @@ def on_morphct(func):
 
 @MyProject.label
 def CT_calced(job):
-    return job.isfile("finished.pickle")
+    if job.isfile("finished.pickle"):
+        return True
+    elif job.isfile("finished.pickel"):
+        return True
+    else:
+        return False
 
 
 @directives(N=1)
@@ -154,6 +159,7 @@ def run_charge_transport(job):
     else:
         pickle_file = open(job.sp.pickle, "rb")
         system = pickle.load(pickle_file)
+        system.outpath = os.path.join(job.ws, "output")
         print("System initialized from pickle file.")
 
     print("Starting KMC run")
@@ -170,8 +176,9 @@ def run_charge_transport(job):
 
     print("Finished KMC run")
     print("Saving final pickle file")
-    pickle_file = open(os.path.join(job.ws, "finished.pickel"), "wb")
+    pickle_file = open(os.path.join(job.ws, "finished.pickle"), "wb")
     pickle.dump(system, pickle_file)
+    job.doc.done = True
     pickle_file.close()
     print("Pickle file saved")
 
