@@ -99,7 +99,7 @@ def on_morphct(func):
 
 @MyProject.label
 def CT_calced(job):
-    return job.isfile("output/kmc/results.csv")
+    return job.isfile("finished.pickle")
 
 
 @directives(N=1)
