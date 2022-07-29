@@ -115,7 +115,9 @@ def run_charge_transport(job):
     import numpy as np
     import pickle
     import polybinderCG.coarse_grain as cg
+    from morphct.kmc_analyze import get_times_msds
     from morphct.system import System
+
     print(f"Starting job {job.id}")
 
     if job.sp.forcefield == "gaff":
@@ -175,9 +177,16 @@ def run_charge_transport(job):
     pickle.dump(system, pickle_file)
     pickle_file.close()
     print("Pickle file saved")
-    job.doc.done = True
+
+    print("Calculating and storing MSD results")
+    data = get_times_msds(system._carrier_data)
+    job.doc.time = data[0][0]
+    job.doc.msd = data[1][0]
+    job.doc.time_stderr = data[2][0]
+    job.doc.msd_stderr = data[3][0]
     job.doc.displacements = system._carrier_data["displacement"]
     job.doc.images = system._carrier_data["image"]
+    job.doc.done = True
 
 
 if __name__ == "__main__":
