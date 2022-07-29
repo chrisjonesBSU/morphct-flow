@@ -101,8 +101,6 @@ def on_morphct(func):
 def CT_calced(job):
     if job.isfile("finished.pickle"):
         return True
-    elif job.isfile("finished.pickel"):
-        return True
     else:
         return False
 
@@ -171,16 +169,15 @@ def run_charge_transport(job):
         verbose=1
 	)
 	# Save primary results to the job document file
-    job.doc.displacements = system._carrier_data["displacement"]
-    job.doc.images = system._carrier_data["image"]
-
     print("Finished KMC run")
     print("Saving final pickle file")
     pickle_file = open(os.path.join(job.ws, "finished.pickle"), "wb")
     pickle.dump(system, pickle_file)
-    job.doc.done = True
     pickle_file.close()
     print("Pickle file saved")
+    job.doc.done = True
+    job.doc.displacements = system._carrier_data["displacement"]
+    job.doc.images = system._carrier_data["image"]
 
 
 if __name__ == "__main__":
